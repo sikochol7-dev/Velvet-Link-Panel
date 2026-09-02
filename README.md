@@ -1,3 +1,17 @@
+# Velvet Link Panel
+
+Panel for creating client configurations and serving them through subscription links.
+
+Fork of [Remnawave Backend](https://github.com/remnawave/backend) 3.4.3.
+
+The fork contains only the backend. Frontend, node and subscription page are the standard Remnawave components.
+
+Client apps, including Velvet Link App, connect to the panel by a subscription link.
+
+License: [AGPL-3.0](LICENCE), same as upstream.
+
+---
+
 ## Remnawave Backend
 
 Backend for Remnawave Panel.
