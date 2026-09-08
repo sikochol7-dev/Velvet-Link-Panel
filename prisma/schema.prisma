@@ -76,11 +76,48 @@ model Users {
   userMetas                      UserMeta[]
   torrentBlockerReports          TorrentBlockerReports[]
   traffic                        UserTraffic?
+  lteQuota                       LteUserQuota?
 
   externalSquad ExternalSquads? @relation(fields: [externalSquadUuid], references: [uuid], onDelete: SetNull)
 
   @@index([expireAt])
   @@map("users")
+}
+
+/// Separate LTE traffic quota. Traffic that passes through nodes flagged `isLte`
+/// is accounted here instead of in `user_traffic.used_traffic_bytes`.
+model LteUserQuota {
+  userId            BigInt    @id @map("user_id")
+  /// 0 = unlimited LTE traffic (same convention as users.traffic_limit_bytes)
+  limitBytes        BigInt    @default(0) @map("limit_bytes")
+  usedBytes         BigInt    @default(0) @map("used_bytes")
+  lifetimeUsedBytes BigInt    @default(0) @map("lifetime_used_bytes")
+  /// ENUM: NO_RESET, DAY, WEEK, MONTH
+  resetStrategy     String    @default("MONTH") @map("reset_strategy")
+  lastResetAt       DateTime? @map("last_reset_at")
+  /// Set when the user was removed from the LTE internal squad because the quota is exhausted
+  blockedAt         DateTime? @map("blocked_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([blockedAt])
+  @@map("lte_user_quota")
+}
+
+/// Per-node balancer / LTE settings, kept outside `nodes` to keep upstream merges trivial.
+model NodeBalancerSettings {
+  nodeUuid  String   @id @map("node_uuid") @db.Uuid
+  isLte     Boolean  @default(false) @map("is_lte")
+  /// Relative capacity, 100 = baseline. Higher weight receives proportionally more users.
+  weight    Int      @default(100) @map("weight")
+  /// Soft cap of simultaneously online users. NULL = no cap.
+  maxOnline Int?     @map("max_online")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+
+  node Nodes @relation(fields: [nodeUuid], references: [uuid], onDelete: Cascade)
+
+  @@map("node_balancer_settings")
 }
 
 model UserTraffic {
@@ -210,6 +247,7 @@ model Nodes {
   connectedUsers               UserTraffic[]
   nodeMetas                    NodeMeta[]
   torrentBlockerReports        TorrentBlockerReports[]
+  balancerSettings             NodeBalancerSettings?
 
   activeConfigProfile ConfigProfiles? @relation(fields: [activeConfigProfileUuid], references: [uuid], onDelete: SetNull)
   provider            InfraProviders? @relation(fields: [providerUuid], references: [uuid], onDelete: SetNull)
