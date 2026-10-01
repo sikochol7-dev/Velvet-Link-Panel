@@ -62,6 +62,21 @@ export const configSchema = z
         METRICS_USER: z.string().min(1),
         METRICS_PASS: z.string().min(1),
         SUB_PUBLIC_DOMAIN: z.string(),
+
+        // Internal squad that grants access to LTE nodes. Users are removed from it when their
+        // LTE quota is exhausted and re-added after a reset. Empty = LTE enforcement disabled.
+        LTE_INTERNAL_SQUAD_UUID: z
+            .string()
+            .default('')
+            .refine(
+                (val) => val === '' || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val),
+                'LTE_INTERNAL_SQUAD_UUID must be a UUID or empty.',
+            ),
+        // Window in seconds in which a user counts as "online" for host balancing.
+        BALANCER_ONLINE_WINDOW_SECONDS: z
+            .string()
+            .default('300')
+            .transform((val) => parseInt(val, 10)),
         WEBHOOK_ENABLED: booleanString('false'),
         WEBHOOK_URL: z.string().optional(),
         WEBHOOK_SECRET_HEADER: z.string().optional(),
