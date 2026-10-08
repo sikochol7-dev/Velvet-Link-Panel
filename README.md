@@ -2,7 +2,7 @@
 
 Panel for creating client configurations and serving them through subscription links.
 
-Fork of [Remnawave Backend](https://github.com/remnawave/backend) 3.4.4.
+Fork of [Remnawave Backend](https://github.com/remnawave/backend) 3.4.5.
 
 The fork contains only the backend. Frontend, node and subscription page are the standard Remnawave components.
 
