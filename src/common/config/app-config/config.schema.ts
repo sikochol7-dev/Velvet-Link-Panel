@@ -12,6 +12,8 @@ const booleanString = (def: 'true' | 'false' = 'false') =>
         .transform((val) => val === 'true')
         .pipe(z.boolean());
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const configSchema = z
     .object({
         __RW_METADATA_VERSION: z.string().default('1.1.1'),
@@ -69,7 +71,7 @@ export const configSchema = z
             .string()
             .default('')
             .refine(
-                (val) => val === '' || /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(val),
+                (val) => val === '' || UUID_PATTERN.test(val),
                 'LTE_INTERNAL_SQUAD_UUID must be a UUID or empty.',
             ),
         // Window in seconds in which a user counts as "online" for host balancing.

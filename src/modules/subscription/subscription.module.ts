@@ -9,11 +9,17 @@ import { ResponseRulesMiddleware } from '@modules/subscription-response-rules/mi
 import { SubscriptionResponseRulesModule } from '@modules/subscription-response-rules/subscription-response-rules.module';
 import { SubscriptionTemplateModule } from '@modules/subscription-template/subscription-template.module';
 
+import { HostBalancerModule } from '../host-balancer/host-balancer.module';
 import { SubscriptionController, SubscriptionsController } from './controllers';
 import { SubscriptionService } from './subscription.service';
 
 @Module({
-    imports: [CqrsModule, SubscriptionTemplateModule, SubscriptionResponseRulesModule],
+    imports: [
+        CqrsModule,
+        SubscriptionTemplateModule,
+        SubscriptionResponseRulesModule,
+        HostBalancerModule,
+    ],
     controllers: [SubscriptionController, SubscriptionsController],
     providers: [SubscriptionService],
     exports: [],

@@ -40,6 +40,7 @@ import { GetUsersWithPaginationQuery } from '@modules/users/queries/get-users-wi
 
 import { UsersQueuesService } from '@queue/_users/users-queues.service';
 
+import { HostBalancerService } from '../host-balancer/host-balancer.service';
 import { GetHostsForUserQuery } from '../hosts/queries/get-hosts-for-user';
 import { GetSubscriptionsQueryDto } from './dto';
 import {
@@ -73,6 +74,7 @@ export class SubscriptionService {
         private readonly xrayGeneratorService: XrayGeneratorService,
         private readonly usersQueuesService: UsersQueuesService,
         private readonly srrMatcher: ResponseRulesMatcherService,
+        private readonly hostBalancer: HostBalancerService,
     ) {
         this.subPublicDomain = this.configService.getOrThrow('SUB_PUBLIC_DOMAIN');
     }
@@ -282,7 +284,7 @@ export class SubscriptionService {
                 user: user.response,
                 hosts: subscriptionSettings.randomizeHosts
                     ? _.shuffle(hosts.response)
-                    : hosts.response,
+                    : await this.hostBalancer.arrange(hosts.response),
                 hostsOverrides,
             });
 
@@ -397,7 +399,7 @@ export class SubscriptionService {
                     user,
                     hosts: patchedSettingEntity.randomizeHosts
                         ? _.shuffle(hosts.response)
-                        : hosts.response,
+                        : await this.hostBalancer.arrange(hosts.response),
                     hostsOverrides: patchedHostsOverrides,
                 });
             } else if (
