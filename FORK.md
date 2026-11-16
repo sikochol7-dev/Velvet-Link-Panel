@@ -1,6 +1,6 @@
 # Fork notes: LTE quota + host balancer
 
-Additions on top of [remnawave/backend](https://github.com/remnawave/backend) v3.4.8.
+Additions on top of [remnawave/backend](https://github.com/remnawave/backend) v3.4.11.
 Licensed under **AGPL-3.0-only**, same as upstream (see `LICENCE`). If you run a modified
 version as a network service you must offer its source to the users of that service.
 
